@@ -1,10 +1,19 @@
 const express = require("express");
 const morgan = require("morgan");
-const { createUser, getUser } = require("./handlers");
+const {
+  createUser,
+  getUser,
+  addFavorite,
+  getUserFavorites,
+} = require("./handlers");
 
 express()
   .use(morgan("tiny"))
   .use(express.json())
+
+  .put("/favorites", addFavorite)
+  .post("/users", createUser)
+  .get("/users-favorites/:displayName", getUserFavorites)
 
   .get("*", (req, res) => {
     res.status(404).json({

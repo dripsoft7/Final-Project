@@ -4,6 +4,7 @@ import Home from "./components/Home";
 import Header from "../src/components/Header";
 import MovieDetails from "./components/MovieDetails";
 import ScrollToTop from "./components/ScrollToTop";
+import ProfilePage from "./components/ProfilePage";
 
 const App = () => {
   return (
@@ -14,6 +15,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/movie/:id" element={<MovieDetails />} />
+        <Route path="/profile" element={<ProfilePage />} />
       </Routes>
     </BrowserRouter>
   );

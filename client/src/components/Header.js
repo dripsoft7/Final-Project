@@ -1,24 +1,30 @@
 import styled from "styled-components";
 import { FiHome, FiUser } from "react-icons/fi";
 import { NavLink } from "react-router-dom";
+import UserToggle from "./UserToggle";
+import ProfilePage from "./ProfilePage";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const Header = () => {
+  const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
+
   return (
     <HeaderWrapper>
       <div>
         <Div>
           <NavigationLink to="/">
             <FiHome />
-            <Option> Home</Option>
+            <Option> Home </Option>
           </NavigationLink>
         </Div>
       </div>
       <Title>BMDb</Title>
       {/* <Img src="./images/logo.jpg" alt="logo" /> */}
       <Div>
-        <NavigationLink to="/login">
-          <FiUser /> <Option> Sign in</Option>
-        </NavigationLink>
+        {isAuthenticated && <ProfilePage>Profile</ProfilePage>}
+        <SignInWrapper>
+          <FiUser /> <UserToggle />
+        </SignInWrapper>
       </Div>
     </HeaderWrapper>
   );
@@ -46,6 +52,25 @@ const Div = styled.span`
   justify-content: baseline;
 `;
 
+const SignInWrapper = styled.div`
+  text-decoration: none;
+  color: white;
+  font-weight: bold;
+  margin-right: 35px;
+  display: flex;
+  justify-content: baseline;
+  align-items: baseline;
+  font-size: 20px;
+  padding: 10px;
+  :hover {
+    background-color: hsla(45, 0%, 80%, 0.1);
+    cursor: pointer;
+    border-radius: 20px;
+  }
+  :active {
+    background-color: hsla(45, 0%, 80%, 0.4);
+  }
+`;
 const Title = styled.h1``;
 
 const NavigationLink = styled(NavLink)`
@@ -54,11 +79,16 @@ const NavigationLink = styled(NavLink)`
   font-weight: bold;
   margin: 0 13px;
   display: flex;
+  justify-content: baseline;
   font-size: 20px;
   padding: 10px;
   :hover {
-    color: purple;
+    background-color: hsla(45, 0%, 80%, 0.1);
+    cursor: pointer;
     border-radius: 20px;
+  }
+  :active {
+    background-color: hsla(45, 0%, 80%, 0.4);
   }
 `;
 

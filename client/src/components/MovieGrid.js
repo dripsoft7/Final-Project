@@ -8,27 +8,35 @@ const MovieGrid = () => {
   const { movies } = useMovies();
   return (
     <Wrapper>
-      {movies.map((movie, index) => {
-        // console.log(movie);
-        return (
-          <ImageContainer key={index}>
-            <NavigationLink to={`/movie/${movie.id}`}>
-              <MovieImage
-                src={movie.poster_path && `${Image}w500${movie.poster_path}`}
-              />
-            </NavigationLink>
-            <BottomTextWrapper>
-              <MovieName to={`/movie/${movie.id}`}>
-                {movie.original_title}
-              </MovieName>
-              <MovieRating>
-                <StyledFiStar />
-                {movie.vote_average}
-              </MovieRating>
-            </BottomTextWrapper>
-          </ImageContainer>
-        );
-      })}
+      {movies.length > 0 ? (
+        <>
+          {movies.map((movie, index) => {
+            // console.log(movie);
+            return (
+              <ImageContainer key={index}>
+                <NavigationLink to={`/movie/${movie.id}`}>
+                  <MovieImage
+                    src={
+                      movie.poster_path && `${Image}w500${movie.poster_path}`
+                    }
+                  />
+                </NavigationLink>
+                <BottomTextWrapper>
+                  <MovieName to={`/movie/${movie.id}`}>
+                    {movie.original_title}
+                  </MovieName>
+                  <MovieRating>
+                    <StyledFiStar />
+                    {movie.vote_average}
+                  </MovieRating>
+                </BottomTextWrapper>
+              </ImageContainer>
+            );
+          })}{" "}
+        </>
+      ) : (
+        <NotFoundText>Movie not Found</NotFoundText>
+      )}
     </Wrapper>
   );
 };
@@ -47,6 +55,9 @@ const StyledFiStar = styled(FaStar)`
   margin-right: 5px;
 `;
 
+const NotFoundText = styled.h1`
+  text-align: center;
+`;
 const MovieName = styled(NavLink)`
   text-decoration: none;
   color: white;

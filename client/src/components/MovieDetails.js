@@ -7,6 +7,7 @@ import { KEY, Image } from "../MovieAPI";
 import moment from "moment";
 import { IconContext } from "react-icons";
 import CastSection from "./CastSection";
+import Footer from "./Footer";
 
 const MovieDetails = () => {
   const { id } = useParams();
@@ -14,7 +15,7 @@ const MovieDetails = () => {
   const [cast, setCast] = useState([]);
   const [crew, setCrew] = useState(false);
   const [buttonText, setButtonText] = useState("All cast & crew");
-  //   const { addMovie } = useMovies(); addmovie to favorites
+  const { addMovie } = useMovies();
 
   useEffect(() => {
     fetch(
@@ -47,70 +48,73 @@ const MovieDetails = () => {
   //   const dispatch = useDispatch();
 
   return (
-    <Wrapper>
-      <Main>
-        <div>
-          {movie && <MovieImage src={`${Image}w500${movie?.poster_path}`} />}
-        </div>
-        <InfoContainer>
-          <InfoHeader>
-            <TitleWrapper>
-              <MovieTitle>{movie.original_title}</MovieTitle>{" "}
-              <Timestamp>
-                {moment(movie.release_date).format("YYYY, MMM Do")}
-              </Timestamp>
-            </TitleWrapper>
-            <Tagline>{movie.tagline}</Tagline>
-          </InfoHeader>
-          <RatingContainer>
-            <div>
-              <ScoreTitle>BMDb Rating</ScoreTitle>
-              <ScoreText>based on {movie.vote_count} reviews</ScoreText>
-            </div>
-            <Score
-              style={
-                movieScoreSlice < 6
-                  ? { backgroundColor: "red" }
-                  : movieScoreSlice < 7.5
-                  ? { backgroundColor: "orange" }
-                  : { backgroundColor: "green" }
-              }
-            >
-              {movieScoreSlice}
-            </Score>
-          </RatingContainer>
-          <SummaryContainer>
-            Summary
-            <Summary>{movie.overview}</Summary>
-          </SummaryContainer>
-          <Div>
-            {/* <FavoriteButton onClick={() => addMovie({ movie })}> */}
-            <IconContext.Provider
-              value={{
-                color: "yellow",
-
-                size: "2em",
-                className: "global-class-name",
-              }}
-            >
+    <>
+      <Wrapper>
+        <Main>
+          <div>
+            {movie && <MovieImage src={`${Image}w500${movie?.poster_path}`} />}
+          </div>
+          <InfoContainer>
+            <InfoHeader>
+              <TitleWrapper>
+                <MovieTitle>{movie.original_title}</MovieTitle>{" "}
+                <Timestamp>
+                  {moment(movie.release_date).format("YYYY, MMM Do")}
+                </Timestamp>
+              </TitleWrapper>
+              <Tagline>{movie.tagline}</Tagline>
+            </InfoHeader>
+            <RatingContainer>
               <div>
-                <FaRegStar />
+                <ScoreTitle>BMDb Rating</ScoreTitle>
+                <ScoreText>based on {movie.vote_count} reviews</ScoreText>
               </div>
-            </IconContext.Provider>
-            <Option> Favorite</Option>
-            {/* </FavoriteButton> */}
-          </Div>
-        </InfoContainer>
-      </Main>
-      <div>
-        <ButtonContainer>
-          <LoadCrew onClick={handleCrew}>{buttonText}</LoadCrew>
-        </ButtonContainer>
-        {crew && <CastNamesContainer>{castNames}</CastNamesContainer>}
-        <CastTitle>Top Cast ></CastTitle>
-        <CastSection cast={cast} />
-      </div>
-    </Wrapper>
+              <Score
+                style={
+                  movieScoreSlice < 6
+                    ? { backgroundColor: "red" }
+                    : movieScoreSlice < 7.5
+                    ? { backgroundColor: "orange" }
+                    : { backgroundColor: "green" }
+                }
+              >
+                {movieScoreSlice}
+              </Score>
+            </RatingContainer>
+            <SummaryContainer>
+              Summary
+              <Summary>{movie.overview}</Summary>
+            </SummaryContainer>
+            <Div>
+              {/* <FavoriteButton onClick={() => addMovie({ movie })}> */}
+              <IconContext.Provider
+                value={{
+                  color: "yellow",
+
+                  size: "2em",
+                  className: "global-class-name",
+                }}
+              >
+                <div>
+                  <FaRegStar />
+                </div>
+              </IconContext.Provider>
+              <Option> Favorite</Option>
+              {/* </FavoriteButton> */}
+            </Div>
+          </InfoContainer>
+        </Main>
+        <div>
+          <ButtonContainer>
+            <LoadCrew onClick={handleCrew}>{buttonText}</LoadCrew>
+          </ButtonContainer>
+          {crew && <CastNamesContainer>{castNames}</CastNamesContainer>}
+          <CastTitle>Top Cast ></CastTitle>
+          <CastSection cast={cast} />
+        </div>
+      </Wrapper>
+      <Footer />
+    </>
   );
 };
 const Wrapper = styled.div``;
@@ -194,6 +198,7 @@ const SummaryContainer = styled.h3`
 const Summary = styled.h5`
   padding: 15px 0;
   font-weight: 200;
+  width: 75%;
 `;
 
 const Div = styled.span`

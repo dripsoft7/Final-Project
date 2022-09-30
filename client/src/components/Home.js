@@ -9,7 +9,7 @@ import { BiSearch } from "react-icons/bi";
 
 const Home = () => {
   const { movies, handleClick, setMovies } = useMovies();
-  // const [movies, setMovies] = useState([]);
+  const [movie, setMovie] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
 
   const url = `https://api.themoviedb.org/3/search/movie?&api_key=${KEY}&query=`;
@@ -96,13 +96,14 @@ const LoadMovies = styled.button`
   text-transform: uppercase;
   border-radius: 6px;
   display: inline-block;
+  margin-bottom: 1rem;
   transition: all 0.3s ease 0s;
   cursor: pointer;
   :hover {
     color: #404040;
     font-weight: 700;
     letter-spacing: 3px;
-    background: none;
+    background: beige;
     transition: all 0.3s ease 0s;
   }
 `;
