@@ -12,14 +12,16 @@ const MovieProvider = ({ children }) => {
   const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
   const [movies, setMovies] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
-  const [favorites, setFavorties] = useState([]);
+  const [favorites, setFavorites] = useState([]);
   const [appUser, setAppUser] = useState({});
   const [loaded, setLoaded] = useState(false);
+  const [load, setLoad] = useState(false);
+  const [error, setError] = useState(false);
 
-  useEffect(() => {
-    const loadPage = `https://api.themoviedb.org/3/movie/popular?api_key=${KEY}&language=en-US&page=1`;
-    getMovies(loadPage);
-  }, []);
+  // useEffect(() => {
+  //   const loadPage = `https://api.themoviedb.org/3/movie/popular?api_key=${KEY}&language=en-US&page=1`;
+  //   getMovies(loadPage);
+  // }, []);
 
   // const addUserFavorite = (favorite) => {
   //   appUser.favorites = [...appUser.favorites, favorite];
@@ -43,41 +45,6 @@ const MovieProvider = ({ children }) => {
     getMovies(loadPage);
   };
 
-  //fetch favorties based on the user's email
-  useEffect(() => {
-    if (user) {
-      fetch(`/users-favorites/` + user.email)
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.result) {
-            setFavorties(data.result.favorites);
-            setLoaded(true);
-          } else {
-            googleUserHandle(data);
-          }
-        })
-        .catch((err) => console.log(err));
-    }
-  }, [user]);
-
-  //posting new user to users db
-  const googleUserHandle = (data) => {
-    fetch("/users", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "content-Type": "application/json",
-      },
-      body: JSON.stringify({ ...user, favorites: [] }),
-    })
-      .then(() => {
-        setLoaded(true);
-      })
-      .catch((error) => {
-        console.error("error", error);
-      });
-  };
-
   // fetch popular movies to put in home page
   useEffect(() => {
     fetch(
@@ -94,7 +61,7 @@ const MovieProvider = ({ children }) => {
 
   return (
     <MovieContext.Provider
-      value={{ movies, handleClick, setMovies, favorites }}
+      value={{ movies, handleClick, setMovies, favorites, setFavorites }}
     >
       {children}
     </MovieContext.Provider>

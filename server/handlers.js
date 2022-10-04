@@ -1,5 +1,5 @@
 "use strict";
-
+const { v4: uuidv4 } = require("uuid");
 require("dotenv").config();
 
 const { MongoClient } = require("mongodb");
@@ -12,37 +12,75 @@ const options = {
 };
 
 //posts new user
-const createUser = async (req, res) => {
-  const newUser = req.body;
+const addUser = async (req, res) => {
+  const { user } = req.body;
   const client = new MongoClient(MONGO_URI, options);
+  const userEmail = user.email;
+  const login = Date();
+  // console.log(req.body);
   try {
+    // check if the user already exist or not
     await client.connect();
     const db = client.db("movieProject");
-    const data = await db.collection("users").insertOne(newUser);
-
-    res.status(200).json({
-      status: 200,
-      message: "New user added",
-    });
-  } catch (error) {
-    res.status(500).json({
-      status: 500,
-      data: req.body,
-      message: "Error adding new user",
-    });
-    console.log(error);
+    const result = await db.collection("users").findOne({ email: userEmail });
+    if (result) {
+      await db
+        .collection("users")
+        .findOneAndUpdate({ email: userEmail }, { $set: { lastLogin: login } });
+      return res
+        .status(200)
+        .json({ status: 200, message: "This user already exist!" });
+    } else {
+      const NewUser = Object.assign(
+        { _id: uuidv4() },
+        { lastLogin: Date() },
+        { joined: Date() },
+        user,
+        { favorites: [] }
+      );
+      await db.collection("users").insertOne(NewUser);
+      return res.status(201).json({ status: 201, message: "New user added!" });
+    }
+  } catch (err) {
+    return res.status(500).json({ status: 500, message: err.message });
   } finally {
     client.close();
   }
 };
 
 const getUser = async (req, res) => {
+  const userEmail = req.headers.email;
   const client = new MongoClient(MONGO_URI, options);
   try {
     await client.connect();
     const db = client.db("movieProject");
-  } catch (err) {
-    console.log(err);
+    const result = await db.collection("users").findOne({ email: userEmail });
+    return res.status(201).json({ status: 200, data: result });
+  } catch (error) {
+    res.status(500).json({
+      status: 500,
+      data: req.body,
+      message: "Error retrieving user",
+    });
+  } finally {
+    client.close();
+  }
+};
+
+const deleteUser = async (req, res) => {
+  const userEmail = req.headers.email;
+  const client = new MongoClient(MONGO_URI, options);
+  try {
+    await client.connect();
+    const db = client.db("movieProject");
+    const result = await db
+      .collection("users")
+      .findOneAndDelete({ email: userEmail });
+    return res
+      .status(204)
+      .json({ status: 204, message: "User has been deleted!" });
+  } catch (error) {
+    res.status(500).json({ status: 500, message: error.message });
   } finally {
     client.close();
   }
@@ -50,17 +88,31 @@ const getUser = async (req, res) => {
 
 const addFavorite = async (req, res) => {
   const client = new MongoClient(MONGO_URI, options);
-  const { email, movie } = req.body;
-  const movieId = movie.movie.id;
+  const { user, movieId } = req.body;
+  const userEmail = user.email;
   try {
     await client.connect();
     const db = client.db("movieProject");
-    const movieUser = await db
-      .collection("userFavorites")
-      .updateOne({ email: email }, { $addToSet: { favorites: movieId } }, true);
-    res.status(201).json({
+    const result = await db.collection("users").findOne({ email: userEmail });
+    const { favorites } = result;
+
+    const ItemExistInfavorites = favorites.find((x) => x === movieId);
+    if (!ItemExistInfavorites) {
+      favorites.push(movieId);
+    }
+
+    const collections = {
+      favorites,
+    };
+    await db.collection("users").findOneAndUpdate(
+      { email: userEmail },
+      {
+        $set: { favorites: favorites },
+      }
+    );
+    return res.status(201).json({
       status: 201,
-      data: movieUser,
+      data: collections,
     });
   } catch (error) {
     res.status(500).json({
@@ -73,47 +125,18 @@ const addFavorite = async (req, res) => {
   }
 };
 
-// const getUserFavorites = async (req, res) => {
-//   const client = new MongoClient(MONGO_URI, options);
-//   try {
-//     await client.connect();
-//     const db = client.db("movieProject");
-
-//     const movieUser = await db.collection("userFavorites").findOne({
-//       displayName: req.params.displayName,
-//     });
-
-//     if (!movieUser) {
-//       res.status(404).json({
-//         status: 404,
-//         message: "No user",
-//       });
-//     } else {
-//       res.status(200).json({
-//         status: 200,
-//         movieUser: movieUser.favorites,
-//       });
-//     }
-//   } catch (error) {
-//     res
-//       .status(500)
-//       .json({ status: 500, message: "Error retrieving user favorites" });
-//   } finally {
-//     client.close();
-//   }
-// };
 const getUserFavorites = async (req, res) => {
   const client = new MongoClient(MONGO_URI, options);
-  const userEmail = req.params.userEmail;
-
+  const userEmail = req.headers.userEmail;
   try {
     await client.connect();
     const db = client.db("movieProject");
-    const data = await db.collection("users").findOne({ email: userEmail });
-
-    res.status(200).json({
+    const result = await db.collection("users").findOne({ email: userEmail });
+    //user's collection of favorites
+    const { favorites } = result;
+    return res.status(200).json({
       status: 200,
-      result: data,
+      data: favorites,
       message: "Favorites found",
     });
   } catch (error) {
@@ -127,9 +150,36 @@ const getUserFavorites = async (req, res) => {
   }
 };
 
+const deleteFromFavorites = async (req, res) => {
+  const client = new MongoClient(MONGO_URI, options);
+  const userEmail = req.headers.email;
+  const id = req.params.id;
+  try {
+    await client.connect();
+    const db = client.db("Final-project");
+    const result = await db.collection("users").findOne({ email: userEmail });
+
+    const { favorites } = result;
+    newFavorites = favorites.filter((x) => x !== Number(id));
+    await db
+      .collection("users")
+      .findOneAndUpdate(
+        { email: userEmail },
+        { $set: { favorites: newFavorites } }
+      );
+    return res.status(200).json({ status: 200, data: newFavorites });
+  } catch (err) {
+    return res.status(500).json({ status: 500, message: err.message });
+  } finally {
+    client.close();
+  }
+};
+
 module.exports = {
-  createUser,
+  addUser,
   getUser,
+  deleteUser,
   addFavorite,
   getUserFavorites,
+  deleteFromFavorites,
 };

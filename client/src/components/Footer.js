@@ -65,7 +65,7 @@ const Img = styled.img`
 const WrapperFooter = styled.div`
   position: relative;
   margin-top: 30px;
-  background-color: #222;
+  background-color: black;
   padding: 0px;
   display: flex;
   flex-direction: column;

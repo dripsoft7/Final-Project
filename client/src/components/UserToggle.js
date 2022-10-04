@@ -5,20 +5,14 @@ const UserToggle = () => {
   //conditional for user login and logout
   const { isAuthenticated, loginWithRedirect, logout } = useAuth0();
   return (
-    <Button
-      onClick={() =>
-        isAuthenticated
-          ? logout({ returnTo: window.location.origin })
-          : loginWithRedirect()
-      }
-    >
-      {isAuthenticated ? "Sign Out" : "Sign In"}
+    <Button onClick={() => (isAuthenticated = loginWithRedirect())}>
+      {isAuthenticated ? "" : "Sign In"}
     </Button>
   );
 };
 
 const Button = styled.button`
-  margin-right: 20px;
+  margin-right: 0px;
   background: none;
   color: white;
   font-weight: bold;
