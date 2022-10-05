@@ -23,7 +23,6 @@ const Home = () => {
         .then((data) => {
           setMovies(data.results);
         });
-
       setSearchTerm("");
     }
   };
@@ -62,8 +61,12 @@ const Wrapper = styled.div`
 `;
 
 const Form = styled.form`
-  margin-top: -2.62rem;
-  text-align: center;
+  /* margin-top: -2.62rem; */
+  /* text-align: center; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px;
 `;
 
 const ButtonContainer = styled.div`
@@ -74,8 +77,8 @@ const ButtonContainer = styled.div`
 
 const SearchBar = styled.input`
   height: 10px;
-  width: 350px;
-  border-radius: 30px;
+  width: 500px;
+  border-radius: 10px;
   margin-right: 10px;
   border: none;
   outline: none;
@@ -86,6 +89,7 @@ const SearchBar = styled.input`
 `;
 const StyledBiSearch = styled(BiSearch)`
   color: darkgrey;
+  font-size: 20px;
 `;
 const LoadMovies = styled.button`
   border: none;

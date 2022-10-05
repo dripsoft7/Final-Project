@@ -96,11 +96,10 @@ const addFavorite = async (req, res) => {
     const result = await db.collection("users").findOne({ email: userEmail });
     const { favorites } = result;
 
-    const ItemExistInfavorites = favorites.find((x) => x === movieId);
-    if (!ItemExistInfavorites) {
+    const ItemExistInFavorites = favorites.find((x) => x === movieId);
+    if (!ItemExistInFavorites) {
       favorites.push(movieId);
     }
-
     const collections = {
       favorites,
     };
@@ -110,6 +109,7 @@ const addFavorite = async (req, res) => {
         $set: { favorites: favorites },
       }
     );
+
     return res.status(201).json({
       status: 201,
       data: collections,
@@ -117,7 +117,6 @@ const addFavorite = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       status: 500,
-      data: req.body,
       message: "Error adding user favorites",
     });
   } finally {
@@ -127,15 +126,15 @@ const addFavorite = async (req, res) => {
 
 const getUserFavorites = async (req, res) => {
   const client = new MongoClient(MONGO_URI, options);
-  const userEmail = req.headers.userEmail;
+  const userEmail = req.headers.email;
   try {
     await client.connect();
     const db = client.db("movieProject");
     const result = await db.collection("users").findOne({ email: userEmail });
     //user's collection of favorites
     const { favorites } = result;
-    return res.status(200).json({
-      status: 200,
+    return res.status(201).json({
+      status: 201,
       data: favorites,
       message: "Favorites found",
     });

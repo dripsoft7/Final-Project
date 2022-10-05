@@ -1,35 +1,266 @@
 import styled from "styled-components";
 import { useContext, useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
+import { KEY, Image } from "../MovieAPI";
+import Spinner2 from "./Spinner2";
+import { FiX } from "react-icons/fi";
+import { FavoritesContext } from "../FavoritesContext";
+import { FaStar } from "react-icons/fa";
+import { NavLink } from "react-router-dom";
+import { Tooltip } from "@material-ui/core";
 
 const Favorites = () => {
   const [currentItems, setCurrentItems] = useState([]);
   const { user, loginWithRedirect, isLoading } = useAuth0();
   const [favoritedMovie, setFavoritedMovie] = useState([]);
+  const { favorites, setFavorites } = useContext(FavoritesContext);
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
 
+  //get a list of user movie Id's from favorites array
   useEffect(() => {
     if (user) {
       const headers = { email: user.email };
       fetch("/api/get-user-favorites", { headers })
         .then((res) => res.json())
         .then((data) => {
-          setFavoritedMovie(data.data);
+          // console.log(data.data);
+          setFavorites(data.data);
         })
         .catch((error) => setError(true));
     }
   }, [user]);
 
+  // getting all movies from favorites based on their IDs
+  useEffect(() => {
+    if (favorites) {
+      const movieLength = favorites.length;
+      let fetchTracker = 0;
+      const moviesInFavorited = [];
+      if (favorites.length !== 0) {
+        favorites.map((id) => {
+          fetch(
+            `https://api.themoviedb.org/3/movie/${id}?api_key=${KEY}&language=en-US`
+          )
+            .then((res) => res.json())
+            .then((data) => {
+              // console.log(data);
+              fetchTracker++;
+              if (!moviesInFavorited.includes(data)) {
+                moviesInFavorited.push(data);
+              }
+              if (fetchTracker === movieLength) {
+                setLoaded(true);
+                setFavoritedMovie(moviesInFavorited);
+              }
+            })
+            .catch((error) => setError(true));
+        });
+      } else {
+        setLoaded(true);
+        setFavoritedMovie([]);
+      }
+    }
+  }, [favorites]);
+
+  useEffect(() => {
+    if (user) {
+      setLoaded(false);
+    }
+  }, [user]);
+
+  // handle removing movie from favorites list
   const handleRemove = (id) => {
     const headers = { email: user.email };
     fetch(`/api/remove-favorite/${id}`, { method: "DELETE", headers })
       .then((res) => res.json())
       .then((data) => {
-        setFavoritedMovie(data.data);
+        setFavorites(data);
+        console.log(data);
       })
       .catch((error) => setError(true));
   };
+
+  if (isLoading) {
+    return (
+      <Wrapper style={{ textAlign: "center" }}>
+        <Spinner2 />
+      </Wrapper>
+    );
+  }
+
+  //if user doesn't have anything in their favorites
+  if (loaded && favoritedMovie.length === 0) {
+    return (
+      <Wrapper style={{ textAlign: "center" }}>
+        <Title>Your Favorites</Title>
+        <h3>Your list is empty!</h3>
+      </Wrapper>
+    );
+  }
+
+  return (
+    <Wrapper>
+      <Title>Your Favorites</Title>
+      {loaded && favoritedMovie.length > 0 ? (
+        <>
+          <Movies>
+            {favoritedMovie.map((movie, index) => {
+              return (
+                <FavMovie>
+                  <MovieDiv>
+                    <MovieImageDiv>
+                      <MovieRedirect to={`/movie/${movie.id}}`}>
+                        <MovieImage src={`${Image}w500${movie.poster_path}`} />
+                      </MovieRedirect>
+                      <Info>
+                        <MovieRedirect to={`/movie/${movie.id}}`}>
+                          <MovieTitle>
+                            {movie.original_title}{" "}
+                            <ReleasedDate>
+                              ({String(movie.release_date).slice(0, 4)})
+                            </ReleasedDate>
+                          </MovieTitle>
+                        </MovieRedirect>{" "}
+                        <Rating>
+                          <StyledFaStar />
+                          {String(movie.vote_average).slice(0, 3)}{" "}
+                        </Rating>{" "}
+                        <Runtime>{movie.runtime} minutes</Runtime>
+                        <VoteCount>Votes: {movie.vote_count}</VoteCount>
+                      </Info>
+                    </MovieImageDiv>
+                  </MovieDiv>
+                  <Remove
+                    onClick={() => {
+                      handleRemove(movie.id);
+                    }}
+                  >
+                    <FiX />
+                  </Remove>
+                </FavMovie>
+              );
+            })}
+          </Movies>
+        </>
+      ) : (
+        <Spinner2 />
+      )}
+    </Wrapper>
+  );
 };
+
+const Wrapper = styled.div`
+  color: white;
+  padding: 20px 60px 0px 60px;
+  height: 100vh;
+  background-color: #131d29;
+  margin-left: 270px;
+  margin-right: 270px;
+  overflow-y: scroll;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`;
+const Title = styled.h1`
+  text-align: center;
+  margin-bottom: 60px;
+`;
+const Movies = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  min-height: 500px;
+  justify-content: space-around;
+  align-items: flex-start;
+`;
+const FavMovie = styled.div`
+  display: flex;
+  align-items: flex-start;
+`;
+
+const MovieTitle = styled.h2`
+  font-size: 22px;
+  padding-bottom: 25px;
+  border-bottom: 1px solid grey;
+`;
+
+const MovieDiv = styled.div`
+  margin-bottom: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 500px;
+  min-height: 230px;
+  background-color: black;
+  border-radius: 6px;
+  padding: 15px;
+`;
+
+const StyledFaStar = styled(FaStar)`
+  color: #f3ce00;
+  font-size: 11px;
+  margin-right: 7px;
+`;
+const Rating = styled.span`
+  /* border-top: 1px solid grey; */
+  font-size: 15px;
+`;
+
+const VoteCount = styled.span`
+  color: #666;
+`;
+const Runtime = styled.span`
+  color: lightgrey;
+`;
+
+const ReleasedDate = styled.span`
+  letter-spacing: 1px;
+  color: #a6a7a8;
+`;
+
+const MovieRedirect = styled(NavLink)`
+  color: white;
+
+  &:hover {
+    text-decoration: 1px underline;
+  }
+`;
+
+const MovieImage = styled.img`
+  max-width: 260px;
+  min-width: 230px;
+  max-height: 140px;
+  min-height: 250px;
+  border-radius: 6px;
+  margin-right: 20px;
+`;
+const MovieImageDiv = styled.div`
+  display: flex;
+  padding-bottom: 15px;
+`;
+
+const Info = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+`;
+
+const Remove = styled.button`
+  margin-left: 6px;
+  padding: 2px;
+  border-radius: 2px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  background-color: inherit;
+  border: 0.3px solid #333123;
+
+  color: #ff0000;
+  cursor: pointer;
+  font-size: 20px;
+`;
 
 export default Favorites;

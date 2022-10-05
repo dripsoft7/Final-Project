@@ -48,14 +48,6 @@ const ProfilePage = () => {
       .finally(logout({ returnTo: window.location.origin }));
   };
 
-  // if (!isLoading && !user) {
-  //   return (
-  //     <Wrapper style={{ textAlign: "center" }}>
-  //       <h3>You need to login in order to access this page!</h3>
-  //     </Wrapper>
-  //   );
-  // }
-
   return (
     <Wrapper>
       {!error ? (
@@ -67,11 +59,10 @@ const ProfilePage = () => {
               </ImageDiv>
               <Info>
                 <h4>Name:</h4>
-                <p>{userInfo.nickname}</p>
+                <NameText>{userInfo.nickname}</NameText>
                 <hr />
                 <h4>Email:</h4>
-                <p>{userInfo.email}</p>
-                <hr />
+                <NameText>{userInfo.email}</NameText>
               </Info>
             </ProfileDev>
             <HistoryDiv>
@@ -82,10 +73,10 @@ const ProfilePage = () => {
                 </ArrowButton>
               </Topic>
               <Content className={historyOpen ? "show" : "content"}>
-                <CreatedText>Created </CreatedText>
-                <span>{moment(userInfo.joined).format("lll")}</span>
+                <CreatedText>Account created </CreatedText>
+                <DateText>{moment(userInfo.joined).format("lll")}</DateText>
                 <CreatedText>Last Login </CreatedText>
-                <span>{moment(userInfo.lastLogIn).format("lll")}</span>
+                <DateText>{moment(userInfo.lastLogIn).format("lll")}</DateText>
               </Content>
             </HistoryDiv>
             <DeleteDev>
@@ -118,6 +109,32 @@ const ProfilePage = () => {
   );
 };
 
+const Wrapper = styled.div`
+  color: white;
+  padding: 120px 60px 0px 60px;
+  height: 100vh;
+  background-color: #131d29;
+  margin-left: 270px;
+  margin-right: 270px;
+  overflow-y: scroll;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  .show {
+    height: 130px;
+  }
+  .down {
+    transform: rotate(0deg);
+    transition: transform 0.3s ease-in-out;
+  }
+  .up {
+    transform: rotate(180deg);
+    transition: transform 0.3s ease-in-out;
+  }
+`;
 const DeleteButton = styled.button`
   background-color: #f44336;
   color: white;
@@ -146,38 +163,18 @@ const ArrowButton = styled.button`
   color: white;
   cursor: pointer;
 `;
-
+const DateText = styled.span`
+  color: lightgrey;
+`;
 const Content = styled.div`
   height: 0px;
   overflow: hidden;
   transition: height 0.3s ease-in-out;
 `;
-const Wrapper = styled.div`
-  color: white;
-  padding: 120px 60px 0px 60px;
-  height: 100vh;
-  background-color: #131d29;
-  margin-left: 270px;
-  margin-right: 270px;
-  overflow-y: scroll;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-  &::-webkit-scrollbar {
-    display: none;
-  }
-
-  .show {
-    height: 130px;
-  }
-  .down {
-    transform: rotate(0deg);
-    transition: transform 0.3s ease-in-out;
-  }
-  .up {
-    transform: rotate(180deg);
-    transition: transform 0.3s ease-in-out;
-  }
+const NameText = styled.span`
+  color: lightgrey;
 `;
+
 const ProfileDev = styled.div`
   background-color: #010206;
   border-radius: 6px;
@@ -190,14 +187,14 @@ const ProfileDev = styled.div`
     min-width: 130px;
     max-width: 130px;
     margin-right: 50px;
-    border: 1px solid gray;
   }
 `;
 const ImageDiv = styled.div``;
 const Info = styled.div`
   hr {
     border: 1px solid grey;
-    margin: 5px 0px;
+    margin-top: 20px;
+    margin-bottom: 20px;
   }
 `;
 const HistoryDiv = styled.div`

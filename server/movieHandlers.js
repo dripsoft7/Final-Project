@@ -6,7 +6,7 @@ require("dotenv").config();
 const { MongoClient } = require("mongodb");
 const { URL, KEY, Image } = process.env;
 // console.log(process.env.MONGO_URI);
-console.log(process.env.KEY);
+// console.log(process.env.KEY);
 
 const options = {
   useNewUrlParser: true,

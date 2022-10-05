@@ -1,8 +1,6 @@
 import styled from "styled-components";
-import { FiHome, FiUser } from "react-icons/fi";
+import { FiHome } from "react-icons/fi";
 import { NavLink } from "react-router-dom";
-import UserToggle from "./UserToggle";
-import ProfilePage from "./ProfilePage";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -10,8 +8,7 @@ import { FiUserPlus } from "react-icons/fi";
 import { RiLoginBoxLine } from "react-icons/ri";
 import { CgProfile } from "react-icons/cg";
 import { RiLogoutBoxRLine } from "react-icons/ri";
-import Favorites from "./Favorites";
-import { FaStar, FaRegStar } from "react-icons/fa";
+import { FaStar } from "react-icons/fa";
 
 const Header = () => {
   const { user, loginWithRedirect, logout } = useAuth0();
@@ -49,7 +46,6 @@ const Header = () => {
         .then((res) => res.json())
         .then((data) => {})
         .then(user && sessionStorage.setItem("email", user.email))
-
         .catch((error) => {
           setError(true);
         });
@@ -86,9 +82,9 @@ const Header = () => {
           </NavigationLink>
         </Div>
       </div>
-      <Title>BMDb</Title>
-      {/* <Img src="./images/logo.jpg" alt="logo" /> */}
-
+      <TitleWrapper>
+        <Title>BMDb</Title>
+      </TitleWrapper>
       <Div>
         {user && (
           <NavigationLink to="/favorites">
@@ -130,17 +126,16 @@ const Header = () => {
             </UserMenuWrapper>
           )}
         </ProfileMenu>
-        {/* {isAuthenticated && <ProfilePage>Profile</ProfilePage>} */}
       </Div>
     </HeaderWrapper>
   );
 };
 
 const Profile = styled.button`
-  margin-right: 4.5rem;
+  /* margin-right: 4.5rem; */
   outline: none;
   border: none;
-  background-color: var(--color-primary);
+  background-color: transparent;
   right: 0;
   padding: 5px;
   &:hover {
@@ -156,7 +151,6 @@ const Profile = styled.button`
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    animation-name: example;
     animation-duration: 2s;
     animation-timing-function: ease-in-out;
     @keyframes example {
@@ -181,12 +175,17 @@ const HeaderWrapper = styled.div`
   background-color: #222;
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
+  justify-content: space-around;
 `;
 
 const Img = styled.img`
   width: 100px;
   height: 100px;
+`;
+const TitleWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 const ProfileMenu = styled.div`
   position: relative;
@@ -194,7 +193,8 @@ const ProfileMenu = styled.div`
 
 const UserMenuWrapper = styled.div`
   position: absolute;
-  right: 48px;
+  /* right: 10px; */
+  left: -22px;
   background-color: #000708;
   color: var(--color-font);
   display: flex;
@@ -256,13 +256,18 @@ const SignInWrapper = styled.div`
     background-color: hsla(45, 0%, 80%, 0.4);
   }
 `;
-const Title = styled.h1``;
+const Title = styled.h1`
+  margin: auto;
+  background-color: #45ccff;
+  border-radius: 7px;
+  padding: 5px;
+`;
 
 const NavigationLink = styled(NavLink)`
   text-decoration: none;
   color: white;
   font-weight: bold;
-  margin: 0 13px;
+  /* margin: 0 13px; */
   display: flex;
   align-items: center;
   justify-content: baseline;

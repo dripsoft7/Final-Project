@@ -1,21 +1,23 @@
 import styled from "styled-components";
 import { FaRegStar } from "react-icons/fa";
 import { useParams } from "react-router-dom";
-import { useState, useEffect } from "react";
-import { useMovies } from "../MovieContext";
+import { useState, useEffect, useContext } from "react";
 import { KEY, Image } from "../MovieAPI";
 import moment from "moment";
-import { IconContext } from "react-icons";
 import CastSection from "./CastSection";
 import Footer from "./Footer";
+import { FavoritesContext } from "../FavoritesContext";
+import Spinner from "./Spinner";
 
 const MovieDetails = () => {
   const { id } = useParams();
   const [movie, setMovie] = useState([]);
   const [cast, setCast] = useState([]);
+  const [crewMembers, setCrewMembers] = useState([]);
   const [crew, setCrew] = useState(false);
   const [buttonText, setButtonText] = useState("All cast & crew");
-  const { addMovie } = useMovies();
+  const { handleFavorites } = useContext(FavoritesContext);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     fetch(
@@ -24,15 +26,19 @@ const MovieDetails = () => {
       .then((res) => res.json())
       .then((data) => {
         setMovie(data);
+        setLoaded(true);
 
         fetch(`https://api.themoviedb.org/3/movie/${id}/credits?api_key=${KEY}`)
           .then((res) => res.json())
           .then((data) => {
             setCast(data.cast);
+            setCrewMembers(data.crew);
+            setLoaded(true);
           });
       });
   }, []);
   const castNames = cast.map((cast) => cast.name + ", ");
+  const crewNames = crewMembers.map((crew) => crew.name + ", ");
 
   const handleCrew = () => {
     setCrew(!crew);
@@ -45,74 +51,79 @@ const MovieDetails = () => {
   const movieScore = movie.vote_average;
   const movieScoreSlice = String(movieScore).slice(0, 3);
 
-  //   const dispatch = useDispatch();
-
   return (
     <>
-      <Wrapper>
-        <Main>
-          <div>
-            {movie && <MovieImage src={`${Image}w500${movie?.poster_path}`} />}
-          </div>
-          <InfoContainer>
-            <InfoHeader>
-              <TitleWrapper>
-                <MovieTitle>{movie.original_title}</MovieTitle>{" "}
-                <Timestamp>
-                  {moment(movie.release_date).format("YYYY, MMM Do")}
-                </Timestamp>
-              </TitleWrapper>
-              <Tagline>{movie.tagline}</Tagline>
-            </InfoHeader>
-            <RatingContainer>
-              <div>
-                <ScoreTitle>BMDb Rating</ScoreTitle>
-                <ScoreText>based on {movie.vote_count} reviews</ScoreText>
-              </div>
-              <Score
-                style={
-                  movieScoreSlice < 6
-                    ? { backgroundColor: "red" }
-                    : movieScoreSlice < 7.5
-                    ? { backgroundColor: "orange" }
-                    : { backgroundColor: "green" }
-                }
-              >
-                {movieScoreSlice}
-              </Score>
-            </RatingContainer>
-            <SummaryContainer>
-              Summary
-              <Summary>{movie.overview}</Summary>
-            </SummaryContainer>
-            <Div>
-              {/* <FavoriteButton onClick={() => addMovie({ movie })}> */}
-              <IconContext.Provider
-                value={{
-                  color: "yellow",
-
-                  size: "2em",
-                  className: "global-class-name",
-                }}
-              >
+      {loaded ? (
+        <Wrapper>
+          <Main>
+            <div>
+              {movie && (
+                <MovieImage src={`${Image}w500${movie?.poster_path}`} />
+              )}
+            </div>
+            <InfoContainer>
+              <InfoHeader>
+                <TitleWrapper>
+                  <MovieTitle>{movie.original_title}</MovieTitle>{" "}
+                  <Timestamp>
+                    {moment(movie.release_date).format("YYYY, MMM Do")}
+                  </Timestamp>
+                  <Runtime>• {movie.runtime} minutes</Runtime>
+                </TitleWrapper>
+                <Tagline>{movie.tagline}</Tagline>
+              </InfoHeader>
+              <RatingContainer>
                 <div>
-                  <FaRegStar />
+                  <ScoreTitle>BMDb Rating</ScoreTitle>
+                  <ScoreText>based on {movie.vote_count} reviews</ScoreText>
                 </div>
-              </IconContext.Provider>
-              <Option> Favorite</Option>
-              {/* </FavoriteButton> */}
-            </Div>
-          </InfoContainer>
-        </Main>
-        <div>
-          <ButtonContainer>
-            <LoadCrew onClick={handleCrew}>{buttonText}</LoadCrew>
-          </ButtonContainer>
-          {crew && <CastNamesContainer>{castNames}</CastNamesContainer>}
-          <CastTitle>Top Cast ></CastTitle>
-          <CastSection cast={cast} />
-        </div>
-      </Wrapper>
+                <Score
+                  style={
+                    movieScoreSlice < 6
+                      ? { backgroundColor: "red" }
+                      : movieScoreSlice < 7.5
+                      ? { backgroundColor: "orange" }
+                      : { backgroundColor: "green" }
+                  }
+                >
+                  {movieScoreSlice}
+                </Score>
+              </RatingContainer>
+              <SummaryContainer>
+                Summary
+                <Summary>{movie.overview}</Summary>
+              </SummaryContainer>
+              <Div>
+                <FavoriteButton
+                  onClick={() => {
+                    handleFavorites(movie.id);
+                  }}
+                >
+                  <div>
+                    <FaRegStar />
+                  </div>
+                  {/* </IconContext.Provider> */}
+                  <Option> Add to Favorites</Option>
+                </FavoriteButton>
+              </Div>
+            </InfoContainer>
+          </Main>
+          <div>
+            <ButtonContainer>
+              <LoadCrew onClick={handleCrew}>{buttonText}</LoadCrew>
+            </ButtonContainer>
+            {crew && (
+              <CastNamesContainer>
+                {castNames} {crewNames}
+              </CastNamesContainer>
+            )}
+            <CastTitle>Top Cast </CastTitle>
+            <CastSection cast={cast} />
+          </div>
+        </Wrapper>
+      ) : (
+        <Spinner />
+      )}
       <Footer />
     </>
   );
@@ -166,6 +177,12 @@ const Timestamp = styled.div`
   margin-left: 1.5rem;
 `;
 
+const Runtime = styled.div`
+  color: #bebdc4;
+  font-size: 15px;
+  margin-left: 1.5rem;
+`;
+
 const RatingContainer = styled.div`
   display: flex;
   padding: 50px 0;
@@ -178,7 +195,7 @@ const ScoreTitle = styled.h2`
   margin-bottom: 15px;
 `;
 
-const ScoreText = styled.p`
+const ScoreText = styled.span`
   font-size: 25px;
 `;
 
@@ -191,14 +208,16 @@ const Score = styled.h1`
   border-radius: 5px;
   margin-left: 8rem;
 `;
-const SummaryContainer = styled.h3`
+const SummaryContainer = styled.div`
   padding: 15px 0;
   font-size: 25px;
+  font-weight: bold;
 `;
 const Summary = styled.h5`
   padding: 15px 0;
   font-weight: 200;
   width: 75%;
+  color: lightgray;
 `;
 
 const Div = styled.span`

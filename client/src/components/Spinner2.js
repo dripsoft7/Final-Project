@@ -1,17 +1,13 @@
+import shield from "../images/shield.gif";
 import styled from "styled-components";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import grogu from "../images/grogu.gif";
 
-const Spinner = ({ size }) => {
+const Spinner2 = () => {
   return (
     <Div>
-      {/* <CircularProgress size={size} style={{ color: "var(--color-font)" }} /> */}
-      <img src={grogu} />
+      <img src={shield} />
     </Div>
   );
 };
-
-export default Spinner;
 
 const Div = styled.div`
   display: flex;
@@ -25,3 +21,4 @@ const Div = styled.div`
     height: 10v;
   }
 `;
+export default Spinner2;

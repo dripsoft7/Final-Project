@@ -31,7 +31,7 @@ express()
   .use(morgan("tiny"))
   .use(express.json())
 
-  .put("/api/favorites", addFavorite)
+  .post("/api/add-favorites", addFavorite)
   .post("/api/new-user", addUser)
   .get("/api/get-user", getUser)
   .delete("/api/delete-account", deleteUser)
