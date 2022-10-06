@@ -127,6 +127,7 @@ const addFavorite = async (req, res) => {
 const getUserFavorites = async (req, res) => {
   const client = new MongoClient(MONGO_URI, options);
   const userEmail = req.headers.email;
+  // console.log(userEmail);
   try {
     await client.connect();
     const db = client.db("movieProject");
@@ -153,20 +154,23 @@ const deleteFromFavorites = async (req, res) => {
   const client = new MongoClient(MONGO_URI, options);
   const userEmail = req.headers.email;
   const id = req.params.id;
+  // console.log(userEmail);
+  // console.log(id);
   try {
     await client.connect();
-    const db = client.db("Final-project");
+    const db = client.db("movieProject");
     const result = await db.collection("users").findOne({ email: userEmail });
-
+    // console.log(result);
     const { favorites } = result;
-    newFavorites = favorites.filter((x) => x !== Number(id));
+    // console.log(favorites);
+    const newFavoritesList = favorites.filter((x) => x !== Number(id));
     await db
       .collection("users")
       .findOneAndUpdate(
         { email: userEmail },
-        { $set: { favorites: newFavorites } }
+        { $set: { favorites: newFavoritesList } }
       );
-    return res.status(200).json({ status: 200, data: newFavorites });
+    return res.status(200).json({ status: 200, data: newFavoritesList });
   } catch (err) {
     return res.status(500).json({ status: 500, message: err.message });
   } finally {

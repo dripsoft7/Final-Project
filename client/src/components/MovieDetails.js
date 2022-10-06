@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { FaRegStar } from "react-icons/fa";
+import { FaRegStar, FaHeart } from "react-icons/fa";
 import { useParams } from "react-router-dom";
 import { useState, useEffect, useContext } from "react";
 import { KEY, Image } from "../MovieAPI";
@@ -8,9 +8,11 @@ import CastSection from "./CastSection";
 import Footer from "./Footer";
 import { FavoritesContext } from "../FavoritesContext";
 import Spinner from "./Spinner";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const MovieDetails = () => {
   const { id } = useParams();
+  const { user, loginWithRedirect } = useAuth0();
   const [movie, setMovie] = useState([]);
   const [cast, setCast] = useState([]);
   const [crewMembers, setCrewMembers] = useState([]);
@@ -27,11 +29,12 @@ const MovieDetails = () => {
       .then((data) => {
         setMovie(data);
         setLoaded(true);
-
+        // console.log(data);
         fetch(`https://api.themoviedb.org/3/movie/${id}/credits?api_key=${KEY}`)
           .then((res) => res.json())
           .then((data) => {
             setCast(data.cast);
+            // console.log(data);
             setCrewMembers(data.crew);
             setLoaded(true);
           });
@@ -46,6 +49,10 @@ const MovieDetails = () => {
     const changeText = isButtonToggled ? "All cast & crew" : "All cast & crew";
 
     return setButtonText(changeText);
+  };
+
+  const handleLogIn = () => {
+    loginWithRedirect();
   };
 
   const movieScore = movie.vote_average;
@@ -75,7 +82,9 @@ const MovieDetails = () => {
               <RatingContainer>
                 <div>
                   <ScoreTitle>BMDb Rating</ScoreTitle>
-                  <ScoreText>based on {movie.vote_count} reviews</ScoreText>
+                  <ScoreText>
+                    based on <NumReviews>{movie.vote_count}</NumReviews> reviews
+                  </ScoreText>
                 </div>
                 <Score
                   style={
@@ -88,23 +97,39 @@ const MovieDetails = () => {
                 >
                   {movieScoreSlice}
                 </Score>
+                <Popularity>
+                  {" "}
+                  <PopularityText>
+                    Popularity
+                    <StyledFaHeart />
+                  </PopularityText>{" "}
+                  +{movie.popularity}
+                </Popularity>
               </RatingContainer>
               <SummaryContainer>
                 Summary
                 <Summary>{movie.overview}</Summary>
               </SummaryContainer>
               <Div>
-                <FavoriteButton
-                  onClick={() => {
-                    handleFavorites(movie.id);
-                  }}
-                >
-                  <div>
-                    <FaRegStar />
-                  </div>
-                  {/* </IconContext.Provider> */}
-                  <Option> Add to Favorites</Option>
-                </FavoriteButton>
+                {user ? (
+                  <FavoriteButton
+                    onClick={() => {
+                      handleFavorites(movie.id);
+                    }}
+                  >
+                    <div>
+                      <FaRegStar />
+                    </div>
+                    <Option> Add to Favorites</Option>
+                  </FavoriteButton>
+                ) : (
+                  <DisabledButton onClick={handleLogIn}>
+                    <div>
+                      <FaRegStar />
+                    </div>
+                    <Option>Sign in to add to favorites</Option>
+                  </DisabledButton>
+                )}
               </Div>
             </InfoContainer>
           </Main>
@@ -191,12 +216,29 @@ const RatingContainer = styled.div`
   border-bottom: 1px solid grey;
 `;
 
+const NumReviews = styled.span`
+  color: #45ccff;
+`;
+
+const StyledFaHeart = styled(FaHeart)`
+  color: red;
+  font-size: 21px;
+  margin-left: 8px;
+`;
+const PopularityText = styled.h2`
+  margin-bottom: 15px;
+`;
+const Popularity = styled.span`
+  margin-left: 15rem;
+  font-size: 17px;
+`;
 const ScoreTitle = styled.h2`
   margin-bottom: 15px;
 `;
 
 const ScoreText = styled.span`
   font-size: 25px;
+  color: lightgrey;
 `;
 
 const Score = styled.h1`
@@ -225,6 +267,24 @@ const Div = styled.span`
   padding: 10px;
 `;
 
+const DisabledButton = styled.button`
+  text-decoration: none;
+  background-color: #222;
+  color: white;
+  font-weight: bold;
+  margin: 0 13px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  font-size: 20px;
+  padding: 10px;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  :hover {
+    color: yellow;
+  }
+`;
 const FavoriteButton = styled.button`
   text-decoration: none;
   background-color: #222;
@@ -237,11 +297,10 @@ const FavoriteButton = styled.button`
   font-size: 20px;
   padding: 10px;
   border: none;
-
+  border-radius: 20px;
   cursor: pointer;
   :hover {
     color: yellow;
-    border-radius: 20px;
   }
 `;
 

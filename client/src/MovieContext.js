@@ -1,6 +1,5 @@
 import { useContext, createContext, useState, useEffect } from "react";
 import { URL, KEY } from "../src/MovieAPI";
-import { useAuth0 } from "@auth0/auth0-react";
 
 export const MovieContext = createContext(null);
 
@@ -9,24 +8,14 @@ export const useMovies = () => {
 };
 
 const MovieProvider = ({ children }) => {
-  const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
   const [movies, setMovies] = useState([]);
-  const [currentPage, setCurrentPage] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
   const [favorites, setFavorites] = useState([]);
-  const [appUser, setAppUser] = useState({});
-  const [loaded, setLoaded] = useState(false);
-  const [load, setLoad] = useState(false);
-  const [error, setError] = useState(false);
 
   // useEffect(() => {
   //   const loadPage = `https://api.themoviedb.org/3/movie/popular?api_key=${KEY}&language=en-US&page=1`;
   //   getMovies(loadPage);
   // }, []);
-
-  // const addUserFavorite = (favorite) => {
-  //   appUser.favorites = [...appUser.favorites, favorite];
-  //   setAppUser(appUser);
-  // };
 
   const getMovies = (path) => {
     fetch(path)

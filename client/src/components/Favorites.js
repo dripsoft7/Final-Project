@@ -7,11 +7,9 @@ import { FiX } from "react-icons/fi";
 import { FavoritesContext } from "../FavoritesContext";
 import { FaStar } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
-import { Tooltip } from "@material-ui/core";
 
 const Favorites = () => {
-  const [currentItems, setCurrentItems] = useState([]);
-  const { user, loginWithRedirect, isLoading } = useAuth0();
+  const { user, isLoading } = useAuth0();
   const [favoritedMovie, setFavoritedMovie] = useState([]);
   const { favorites, setFavorites } = useContext(FavoritesContext);
   const [loaded, setLoaded] = useState(false);
@@ -36,7 +34,7 @@ const Favorites = () => {
     if (favorites) {
       const movieLength = favorites.length;
       let fetchTracker = 0;
-      const moviesInFavorited = [];
+      const moviesInFavorites = [];
       if (favorites.length !== 0) {
         favorites.map((id) => {
           fetch(
@@ -46,12 +44,12 @@ const Favorites = () => {
             .then((data) => {
               // console.log(data);
               fetchTracker++;
-              if (!moviesInFavorited.includes(data)) {
-                moviesInFavorited.push(data);
+              if (!moviesInFavorites.includes(data)) {
+                moviesInFavorites.push(data);
               }
               if (fetchTracker === movieLength) {
                 setLoaded(true);
-                setFavoritedMovie(moviesInFavorited);
+                setFavoritedMovie(moviesInFavorites);
               }
             })
             .catch((error) => setError(true));
@@ -72,11 +70,13 @@ const Favorites = () => {
   // handle removing movie from favorites list
   const handleRemove = (id) => {
     const headers = { email: user.email };
+    // console.log(headers);
+    // console.log(id);
     fetch(`/api/remove-favorite/${id}`, { method: "DELETE", headers })
       .then((res) => res.json())
       .then((data) => {
-        setFavorites(data);
-        console.log(data);
+        setFavorites(data.data);
+        // console.log(data.data);
       })
       .catch((error) => setError(true));
   };
