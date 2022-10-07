@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { FaRegStar, FaHeart } from "react-icons/fa";
+import { FaRegStar, FaHeart, FaStar } from "react-icons/fa";
 import { useParams } from "react-router-dom";
 import { useState, useEffect, useContext } from "react";
 import { KEY, Image } from "../MovieAPI";
@@ -9,7 +9,9 @@ import Footer from "./Footer";
 import { FavoritesContext } from "../FavoritesContext";
 import Spinner from "./Spinner";
 import { useAuth0 } from "@auth0/auth0-react";
+import { ScaleIn } from "./ScaleIn";
 
+//movie details page, when user clicks a movie in homepage redirects them for more details on movie
 const MovieDetails = () => {
   const { id } = useParams();
   const { user, loginWithRedirect } = useAuth0();
@@ -18,9 +20,11 @@ const MovieDetails = () => {
   const [crewMembers, setCrewMembers] = useState([]);
   const [crew, setCrew] = useState(false);
   const [buttonText, setButtonText] = useState("All cast & crew");
-  const { handleFavorites } = useContext(FavoritesContext);
+  const { handleFavorites, isFavorited, setIsFavorited, findMovie } =
+    useContext(FavoritesContext);
   const [loaded, setLoaded] = useState(false);
 
+  //fetch movies based on id
   useEffect(() => {
     fetch(
       `https://api.themoviedb.org/3/movie/${id}?api_key=${KEY}&language=en-US`
@@ -30,6 +34,7 @@ const MovieDetails = () => {
         setMovie(data);
         setLoaded(true);
         // console.log(data);
+        //fetch movie credits based on movie id
         fetch(`https://api.themoviedb.org/3/movie/${id}/credits?api_key=${KEY}`)
           .then((res) => res.json())
           .then((data) => {
@@ -40,9 +45,15 @@ const MovieDetails = () => {
           });
       });
   }, []);
-  const castNames = cast.map((cast) => cast.name + ", ");
-  const crewNames = crewMembers.map((crew) => crew.name + ", ");
 
+  const castNames = cast.map((cast) => cast.name + ", "); //mapping over cast to list cast names
+  const crewNames = crewMembers.map((crew) => crew.name + ", ");
+  const movieId = movie.id; //movie id
+  const addedMovie = findMovie(movieId);
+  const movieScore = movie.vote_average;
+  const movieScoreSlice = String(movieScore).slice(0, 3);
+
+  //button toggle to see all cast & crew
   const handleCrew = () => {
     setCrew(!crew);
     const isButtonToggled = !buttonText;
@@ -51,12 +62,10 @@ const MovieDetails = () => {
     return setButtonText(changeText);
   };
 
+  //login redirect with auth0
   const handleLogIn = () => {
     loginWithRedirect();
   };
-
-  const movieScore = movie.vote_average;
-  const movieScoreSlice = String(movieScore).slice(0, 3);
 
   return (
     <>
@@ -117,10 +126,25 @@ const MovieDetails = () => {
                       handleFavorites(movie.id);
                     }}
                   >
-                    <div>
-                      <FaRegStar />
-                    </div>
-                    <Option> Add to Favorites</Option>
+                    {isFavorited ? (
+                      !addedMovie ? (
+                        <Option>
+                          <StyledFaRegStar />
+                          Add to Favorites
+                        </Option>
+                      ) : addedMovie === "Added to Favorites" ? (
+                        <ScaleIn>
+                          <FavoriteActive>
+                            <StyledFaStar />
+                            Added
+                          </FavoriteActive>
+                        </ScaleIn>
+                      ) : (
+                        ""
+                      )
+                    ) : (
+                      ""
+                    )}
                   </FavoriteButton>
                 ) : (
                   <DisabledButton onClick={handleLogIn}>
@@ -153,6 +177,7 @@ const MovieDetails = () => {
     </>
   );
 };
+
 const Wrapper = styled.div``;
 
 const Main = styled.div`
@@ -220,10 +245,17 @@ const NumReviews = styled.span`
   color: #45ccff;
 `;
 
+const StyledFaRegStar = styled(FaRegStar)`
+  margin-right: 5px;
+`;
 const StyledFaHeart = styled(FaHeart)`
   color: red;
   font-size: 21px;
   margin-left: 8px;
+`;
+const StyledFaStar = styled(FaStar)`
+  color: yellow;
+  margin-right: 5px;
 `;
 const PopularityText = styled.h2`
   margin-bottom: 15px;
@@ -304,8 +336,16 @@ const FavoriteButton = styled.button`
   }
 `;
 
+const FavoriteActive = styled.div`
+  display: flex;
+  color: yellow;
+  padding: 5px;
+  margin: 0 10px;
+`;
 const Option = styled.div`
   margin: 0 10px;
+  display: flex;
+  padding: 5px;
 `;
 
 const CastNamesContainer = styled.div`

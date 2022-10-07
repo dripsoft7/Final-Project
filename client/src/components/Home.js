@@ -12,8 +12,10 @@ const Home = () => {
   const [movie, setMovie] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
 
+  //movie api url for searching movies
   const url = `https://api.themoviedb.org/3/search/movie?&api_key=${KEY}&query=`;
 
+  //search bar functionality
   const handleOnSubmit = (e) => {
     e.preventDefault();
 
@@ -23,7 +25,7 @@ const Home = () => {
         .then((data) => {
           setMovies(data.results);
         });
-      setSearchTerm("");
+      setSearchTerm(""); //reset on search bar on enter
     }
   };
 

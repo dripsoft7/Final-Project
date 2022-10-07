@@ -1,11 +1,10 @@
 import styled from "styled-components";
-import CircularProgress from "@material-ui/core/CircularProgress";
 import grogu from "../images/grogu.gif";
 
-const Spinner = ({ size }) => {
+//loading spinner
+const Spinner = () => {
   return (
     <Div>
-      {/* <CircularProgress size={size} style={{ color: "var(--color-font)" }} /> */}
       <img src={grogu} />
     </Div>
   );

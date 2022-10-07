@@ -9,6 +9,7 @@ import { RiLoginBoxLine } from "react-icons/ri";
 import { CgProfile } from "react-icons/cg";
 import { RiLogoutBoxRLine } from "react-icons/ri";
 import { FaStar } from "react-icons/fa";
+import userIcon from "../images/user.png";
 
 const Header = () => {
   const { user, loginWithRedirect, logout } = useAuth0();
@@ -16,6 +17,7 @@ const Header = () => {
   const menuRef = useRef(null);
   const [error, setError] = useState(false);
 
+  //toggle profile menu between sign in/ sign up, etc
   const handleClick = () => {
     setToggleProfileMenu(!toggleProfileMenu);
   };
@@ -23,10 +25,13 @@ const Header = () => {
   const handleLogIn = () => {
     loginWithRedirect();
   };
+
+  //handle logout with auth0
   const handleLogOut = () => {
     sessionStorage.clear();
     logout({ returnTo: window.location.origin });
   };
+
   const handleSignUp = () => {
     loginWithRedirect();
   };
@@ -67,6 +72,7 @@ const Header = () => {
     };
   }, [toggleProfileMenu]);
 
+  //redirect to user's profile page
   const navigate = useNavigate();
   const handleGoToProfile = () => {
     navigate("/profile");
@@ -76,29 +82,29 @@ const Header = () => {
     <HeaderWrapper>
       <div>
         <Div>
-          <NavigationLink to="/">
+          <NavigationLink to="/home">
             <FiHome />
             <Option> Home </Option>
           </NavigationLink>
         </Div>
       </div>
       <TitleWrapper>
-        <Title>BMDb</Title>
+        <Title to="/">BMDb</Title>
       </TitleWrapper>
       <Div>
-        {user && (
-          <NavigationLink to="/favorites">
-            <StyledFaStar />
-            Favorites
-          </NavigationLink>
-        )}
+        {/* {user && ( */}
+        <NavigationLink to="/favorites">
+          <StyledFaStar />
+          Favorites
+        </NavigationLink>
+        {/* // )} */}
         <ProfileMenu>
           {" "}
           <Profile onClick={handleClick} ref={menuRef}>
             {user ? (
               <img src={user.picture} alt="profile" />
             ) : (
-              <StyledFiUserPlus />
+              <ImgUser src={userIcon} />
             )}
           </Profile>
           {user && (
@@ -132,19 +138,16 @@ const Header = () => {
 };
 
 const Profile = styled.button`
-  /* margin-right: 4.5rem; */
+  margin-right: -8.5rem;
   outline: none;
   border: none;
   background-color: transparent;
   right: 0;
   padding: 5px;
   &:hover {
-    background-color: hsla(45, 0%, 80%, 0.1);
+    /* background-color: hsla(45, 0%, 80%, 0.1); */
     cursor: pointer;
     border-radius: 20px;
-  }
-  :active {
-    background-color: hsla(45, 0%, 80%, 0.4);
   }
   img {
     cursor: pointer;
@@ -168,24 +171,24 @@ const StyledFaStar = styled(FaStar)`
   color: yellow;
   margin-right: 5px;
 `;
+
 const HeaderWrapper = styled.div`
   width: 100%;
   padding-top: 10px;
-  padding-bottom: 22px;
+  padding-bottom: 10px;
   background-color: #222;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-around;
 `;
 
-const Img = styled.img`
-  width: 100px;
-  height: 100px;
+const ImgUser = styled.img`
+  border: none;
 `;
 const TitleWrapper = styled.div`
   display: flex;
   justify-content: center;
-  align-items: center;
+  /* align-items: center; */
 `;
 const ProfileMenu = styled.div`
   position: relative;
@@ -196,7 +199,6 @@ const UserMenuWrapper = styled.div`
   /* right: 10px; */
   left: -22px;
   background-color: #000708;
-  color: var(--color-font);
   display: flex;
   flex-direction: column;
   width: 110px;
@@ -215,11 +217,6 @@ const UserMenuWrapper = styled.div`
   }
 `;
 
-const StyledFiUserPlus = styled(FiUserPlus)`
-  color: white;
-  font-size: 30px;
-  margin-right: 8px;
-`;
 const MenuItem = styled.div`
   display: flex;
   padding: 5px;
@@ -232,32 +229,16 @@ const MenuItem = styled.div`
 `;
 const Div = styled.span`
   display: flex;
-  text-decoration: none;
+  /* text-decoration: none; */
   padding: 10px;
-  justify-content: baseline;
+  /* justify-content: baseline; */
 `;
 
-const SignInWrapper = styled.div`
-  text-decoration: none;
+const Title = styled(NavLink)`
+  margin: auto;
   color: white;
   font-weight: bold;
-  margin-right: 0px;
-  display: flex;
-  justify-content: baseline;
-  align-items: baseline;
-  font-size: 20px;
-  padding: 10px;
-  :hover {
-    background-color: hsla(45, 0%, 80%, 0.1);
-    cursor: pointer;
-    border-radius: 20px;
-  }
-  :active {
-    background-color: hsla(45, 0%, 80%, 0.4);
-  }
-`;
-const Title = styled.h1`
-  margin: auto;
+  font-size: 32px;
   background-color: #45ccff;
   border-radius: 7px;
   padding: 5px;

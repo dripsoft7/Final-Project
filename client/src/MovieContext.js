@@ -26,6 +26,7 @@ const MovieProvider = ({ children }) => {
       });
   };
 
+  const page = Math.floor(1 + Math.random() * 20);
   //handle to load following page of movies
   const handleClick = () => {
     const loadPage = `https://api.themoviedb.org/3/movie/popular?api_key=${KEY}&language=en-US&page=${
@@ -37,11 +38,12 @@ const MovieProvider = ({ children }) => {
   // fetch popular movies to put in home page
   useEffect(() => {
     fetch(
-      `https://api.themoviedb.org/3/movie/popular?api_key=${KEY}&language=en-US&page=1`
+      `https://api.themoviedb.org/3/movie/popular?api_key=${KEY}&language=en-US&page=${page}`
     )
       .then((res) => res.json())
       .then((data) => {
         setMovies(data.results);
+        // console.log(data);
       })
       .catch((error) => {
         console.log(error);

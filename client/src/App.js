@@ -7,6 +7,7 @@ import ScrollToTop from "./components/ScrollToTop";
 import ProfilePage from "./components/ProfilePage";
 import Favorites from "./components/Favorites";
 import ActorInfo from "./components/ActorInfo";
+import IntroPage from "./components/IntroPage";
 
 const App = () => {
   return (
@@ -15,7 +16,8 @@ const App = () => {
       <GlobalStyles />
       <Header />
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/home" element={<Home />} />
+        <Route path="/" element={<IntroPage />} />
         <Route path="/movie/:id" element={<MovieDetails />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/favorites" element={<Favorites />} />

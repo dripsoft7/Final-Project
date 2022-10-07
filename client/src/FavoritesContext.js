@@ -6,6 +6,7 @@ export const FavoritesContext = createContext();
 export const FavoritesProvider = ({ children }) => {
   const { user } = useAuth0();
   const [favorites, setFavorites] = useState([]);
+  const [isFavorited, setIsFavorited] = useState(false); //if movie is favorited based on movie id
 
   //get user
   useEffect(() => {
@@ -15,9 +16,11 @@ export const FavoritesProvider = ({ children }) => {
         .then((res) => res.json())
         .then((data) => {
           setFavorites(data.data.favorites);
+          setIsFavorited(true);
         })
         .catch((error) => console.log(error));
     } else if (!user) {
+      setIsFavorited(true);
       setFavorites([]);
     }
   }, [user]);
@@ -34,10 +37,19 @@ export const FavoritesProvider = ({ children }) => {
       .then((res) => res.json())
       .then((data) => {
         setFavorites(data.data.favorites);
+        // setIsFavorited(true);
       })
       .catch((error) => {
         console.log(error);
       });
+  };
+
+  const findMovie = (movieId) => {
+    if (favorites.includes(movieId)) {
+      return "Added to Favorites";
+    } else {
+      return null;
+    }
   };
 
   return (
@@ -46,6 +58,9 @@ export const FavoritesProvider = ({ children }) => {
         handleFavorites,
         favorites,
         setFavorites,
+        isFavorited,
+        setIsFavorited,
+        findMovie,
       }}
     >
       {children}

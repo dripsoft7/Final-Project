@@ -1,5 +1,6 @@
 import styled from "styled-components";
 
+//featured movie in home page
 const FeaturedMovie = ({ image, title, text }) => {
   return (
     <Wrapper image={image}>

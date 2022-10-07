@@ -9,7 +9,7 @@ import { FaStar } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 
 const Favorites = () => {
-  const { user, isLoading } = useAuth0();
+  const { user, isLoading, loginWithRedirect } = useAuth0();
   const [favoritedMovie, setFavoritedMovie] = useState([]);
   const { favorites, setFavorites } = useContext(FavoritesContext);
   const [loaded, setLoaded] = useState(false);
@@ -67,6 +67,10 @@ const Favorites = () => {
     }
   }, [user]);
 
+  const handleLogIn = () => {
+    loginWithRedirect();
+  };
+
   // handle removing movie from favorites list
   const handleRemove = (id) => {
     const headers = { email: user.email };
@@ -90,11 +94,22 @@ const Favorites = () => {
   }
 
   //if user doesn't have anything in their favorites
-  if (loaded && favoritedMovie.length === 0) {
+  if (loaded && favoritedMovie.length === 0 && user) {
     return (
       <Wrapper style={{ textAlign: "center" }}>
         <Title>Your Favorites</Title>
         <h3>Your list is empty!</h3>
+      </Wrapper>
+    );
+  }
+  // if user is not signed in, login redirect
+  if (loaded && !user) {
+    return (
+      <Wrapper style={{ textAlign: "center" }}>
+        <Title>Sign in to access this page</Title>
+        <RedirectButton onClick={handleLogIn}>
+          Click Here to Sign In
+        </RedirectButton>
       </Wrapper>
     );
   }
@@ -166,6 +181,7 @@ const Wrapper = styled.div`
 `;
 const Title = styled.h1`
   text-align: center;
+  margin-top: 30px;
   margin-bottom: 60px;
 `;
 const Movies = styled.div`
@@ -186,6 +202,22 @@ const MovieTitle = styled.h2`
   border-bottom: 1px solid grey;
 `;
 
+const RedirectButton = styled.button`
+  border-radius: 5px;
+  border: none;
+  padding: 4px 10px;
+  background-color: #0ccbff;
+  cursor: pointer;
+  font-weight: bold;
+  width: 150px;
+  height: 50px;
+  transition: transform 200ms ease-in;
+  transition: background-color 200ms ease-in-out;
+  :hover {
+    background-color: teal;
+    transform: scale(1.03);
+  }
+`;
 const MovieDiv = styled.div`
   margin-bottom: 40px;
   display: flex;

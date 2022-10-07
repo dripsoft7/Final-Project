@@ -2,8 +2,9 @@ import styled from "styled-components";
 import { useMovies } from "../MovieContext";
 import { Image } from "../MovieAPI";
 import { NavLink } from "react-router-dom";
-import { FaStar, FaRegStar } from "react-icons/fa";
+import { FaStar } from "react-icons/fa";
 
+//movie grid that displays movie in home page
 const MovieGrid = () => {
   const { movies } = useMovies();
   return (

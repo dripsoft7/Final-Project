@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import { NavLink } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 import moment from "moment";
 import { AiOutlineDown } from "react-icons/ai";
@@ -9,13 +8,14 @@ import Spinner from "./Spinner";
 import Error from "./Error";
 
 const ProfilePage = () => {
-  const { logout, user, isLoading } = useAuth0();
+  const { logout, user } = useAuth0();
   const [userInfo, setUserInfo] = useState([]);
   const [error, setError] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
+  //fetch user
   useEffect(() => {
     if (user) {
       const headers = { email: user.email };
@@ -29,14 +29,17 @@ const ProfilePage = () => {
     }
   }, [user]);
 
+  //toggle user's activity
   const handleHistory = () => {
     setHistoryOpen(!historyOpen);
   };
 
+  //toggle user's account
   const handleAccount = () => {
     setAccountOpen(!accountOpen);
   };
 
+  //handle to delete account if user wants to
   const handleDeleteAccount = () => {
     const headers = { email: user.email };
     fetch("/api/delete-account", { method: "DELETE", headers })

@@ -1,6 +1,7 @@
 import shield from "../images/shield.gif";
 import styled from "styled-components";
 
+//loading spinner
 const Spinner2 = () => {
   return (
     <Div>
