@@ -262,9 +262,9 @@ const MovieRedirect = styled(NavLink)`
 
 const MovieImage = styled.img`
   max-width: 260px;
-  min-width: 230px;
-  max-height: 140px;
-  min-height: 250px;
+  min-width: 240px;
+  max-height: 160px;
+  min-height: 310px;
   border-radius: 6px;
   margin-right: 20px;
 `;

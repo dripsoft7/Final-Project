@@ -10,6 +10,7 @@ import { FavoritesContext } from "../FavoritesContext";
 import Spinner from "./Spinner";
 import { useAuth0 } from "@auth0/auth0-react";
 import { ScaleIn } from "./ScaleIn";
+import Rating from "./Rating";
 
 //movie details page, when user clicks a movie in homepage redirects them for more details on movie
 const MovieDetails = () => {
@@ -87,6 +88,7 @@ const MovieDetails = () => {
                   <Runtime>• {movie.runtime} minutes</Runtime>
                 </TitleWrapper>
                 <Tagline>{movie.tagline}</Tagline>
+                <Rating movieId={movie.id} />
               </InfoHeader>
               <RatingContainer>
                 <div>
